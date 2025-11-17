@@ -36,29 +36,32 @@ $(document).ready(function () {
   const searchButtonOriginalText =
     '<i class="bi bi-search me-2"></i> ရှာဖွေမည်';
 
-  // --- Canvas Functions (No Change) ---
+  // --- Canvas Functions ---
   function resizeCanvas() {
-    // ... (resizeCanvas function - same as previous fix)
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0) return;
+    const displayWidth = rect.width;
+    const displayHeight = 200; 
 
-    const currentSignature = canvas.toDataURL();
-    canvas.width = rect.width;
-    canvas.height = 200;
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+      const currentSignature = canvas.toDataURL();
 
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 3;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      canvas.width = displayWidth;
+      canvas.height = displayHeight;
 
-    if (currentSignature && currentSignature !== "data:,") {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      };
-      img.src = currentSignature;
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (currentSignature && currentSignature !== "data:,") {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = currentSignature;
+      }
     }
   }
 
@@ -328,6 +331,9 @@ $(document).ready(function () {
       showStatusMessage(result.message, "info");
       $signatureSection.removeClass("d-none");
       $agreementText.removeClass("d-none");
+
+      requestAnimationFrame(resizeCanvas);
+      
       clearCanvas();
 
       // Set applicant details
@@ -412,6 +418,7 @@ $(document).ready(function () {
 
   // INITIALIZATION AND EVENT LISTENERS
   resizeCanvas();
+  $(window).on("load", resizeCanvas);
   $(window).on("resize", resizeCanvas);
 
   $canvas.on("mousedown touchstart", startDrawing);
